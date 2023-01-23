@@ -1,20 +1,64 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
+import Authcontext from "./context/Authcontext"
+import { useContext} from "react"
 
 export default function Novasaida(){
+    const [valor, setValor] = useState("")
+    const [descricao, setDescricao] = useState("")
+    const navigate = useNavigate()
+    const { token, SetToken, imagem, SetImagem } = useContext(Authcontext)
+
+
     return (<div><Pagina>
-    <Head>
-        <Nome>Nova saída</Nome>
-    </Head>
-    <Corpo>
-                <Dados><Input  type="number" placeholder="Valor"   required ></Input></Dados>
-                <Dados><Input  type="string" placeholder="Descrição"  required ></Input></Dados>
-                <Dados><Entrar   >
-                    <Texto>Salvar saída</Texto></Entrar></Dados>
-            </Corpo>
-</Pagina>
-</div>)
+        <Head>
+            <Nome>Nova saida</Nome>
+        </Head>
+        <Corpo onSubmit={mandarDados}>
+            <Dados><Input type="number" placeholder="Valor" value={valor} onChange={e => setValor(e.target.value)} required ></Input></Dados>
+            <Dados><Input type="string" placeholder="Descrição" value={descricao} onChange={e => setDescricao(e.target.value)} required ></Input></Dados>
+            <Dados><Entrar>
+                <Texto>Salvar saida</Texto></Entrar></Dados>
+        </Corpo>
+    </Pagina>
+    </div>)
+
+
+    function mandarDados(e) {
+        e.preventDefault()
+        const dados = {
+            valor,
+            descricao
+        }
+
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+            
+        }
+
+        console.log(valor)
+        console.log(descricao)
+        console.log(dados)
+        const url_post = `http://localhost:5002/nova-saida`
+        const promise = axios.post(url_post, dados,config)
+
+        promise.then(resposta => {
+            console.log(resposta.data)
+            navigate("/home")
+        })
+
+        promise.catch(err => {
+            console.log(err)
+            alert("Deu erro tente novamente")
+        })
+    }
 }
+
 
 const Pagina = styled.div`
 min-height:1000px;
